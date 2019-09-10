@@ -9,7 +9,7 @@ require('eris-embed-builder');
 
 const bot = new Eris("NTA5MjU5MTY0MTM3MTYwNzE0.XXcQhw.36eCYpfIsQH9heSNT41GwdXxXlI");
 const youtube = new YouTube("AIzaSyBQX2_e827r7xZ20qeF24cNN1ELQrG_V_s");
-const lyricist = new Lyricist("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym"); 
+const lyricist = new Lyricist("	"); 
 const genius = new geniusApi("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym");
 const giphy = new Giphy("sYa4f5obYilF1OWcLTZBL9peVxzJdVxM");
 
