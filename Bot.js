@@ -7,7 +7,7 @@ const geniusApi = require('genius-api');
 const Giphy = require('giphy');
 require('eris-embed-builder');
 
-const bot = new Eris("NTA5MjU5MTY0MTM3MTYwNzE0.XTZx-w.MrgjUw_xATAnUB4xqeGi1DfejoE");
+const bot = new Eris("NTA5MjU5MTY0MTM3MTYwNzE0.XXcQhw.36eCYpfIsQH9heSNT41GwdXxXlI");
 const youtube = new YouTube("AIzaSyBQX2_e827r7xZ20qeF24cNN1ELQrG_V_s");
 const lyricist = new Lyricist("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym"); 
 const genius = new geniusApi("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym");
@@ -55,7 +55,9 @@ bot.on("messageCreate", msg => {
 				q = msg.content.split(" ")[1];
 				handleSearch( q , msg.channel , num);
 			}
-			else if ( arg === prefix +)
+			else if ( arg === prefix ){
+
+			}
 		}
 });
 
