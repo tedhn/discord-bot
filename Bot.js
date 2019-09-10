@@ -55,7 +55,9 @@ bot.on("messageCreate", msg => {
 				q = msg.content.split(" ")[1];
 				handleSearch( q , msg.channel , num);
 			}
-			else if ( arg === prefix +)
+			else if ( arg === prefix + "quiz"){
+
+			}
 		}
 });
 
