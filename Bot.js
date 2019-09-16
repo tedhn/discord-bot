@@ -6,6 +6,8 @@ const Lyricist = require('lyricist/node6');
 const geniusApi = require('genius-api');
 const Giphy = require('giphy');
 require('eris-embed-builder');
+const fetch = require('node-fetch');
+
 
 const bot = new Eris("NTA5MjU5MTY0MTM3MTYwNzE0.XXhT6w.FMqYIv4Cy5ozhAmdFmbSHe9pVlw");
 const youtube = new YouTube("AIzaSyBQX2_e827r7xZ20qeF24cNN1ELQrG_V_s");
@@ -23,6 +25,11 @@ let q = "";
 let song = "";
 let edit = "";
 let prefix = "`";
+let quiz = [];
+let inQuiz = false;
+let answered = false;
+let correct = 0;
+let number = 0;
 
 bot.on("ready" , () =>{
 	console.log("Ready");
@@ -37,9 +44,7 @@ bot.on("messageCreate", msg => {
 		if(msg.member.id !== "509259164137160714"){
 			if(arg ===  prefix + "p"){
 				song = msg.content.substring(2,msg.content.length);
-
 				handleYoutubeSearch(song, msg.channel); 			
-
 			}
 			else if ( arg == prefix + "q"){
 				handleQ( msg.channel );
@@ -48,15 +53,15 @@ bot.on("messageCreate", msg => {
 				let title = msg.content.substring(2,msg.content.length);
 				handleL(title,msg.channel);
 			}
-			else if ( arg === prefix + "help"){
-				msg.channel.createMessage(" %p  to start playing songs \n %q to see the queue \n %l to find the lyrics of the song \n %search to find images / gifs");
-			}
 			else if( arg === prefix + "search"){
 				q = msg.content.split(" ")[1];
 				handleSearch( q , msg.channel , num);
 			}
 			else if ( arg === prefix + "quiz"){
-
+				handleQuiz(msg.channel);
+			}			
+			else if ( arg === prefix + "help"){
+				msg.channel.createMessage(" %p  to start playing songs \n %q to see the queue \n %l to find the lyrics of the song \n %search to find images / gifs");
 			}
 		}
 });
@@ -81,6 +86,7 @@ function handleP(url , channel , user , vc){
 // working .. sometimes //
 function playMusic(vc , channel){
 
+
 	if(queue.length !== 0){
 		if(!joined){
 			try{
@@ -98,20 +104,17 @@ function playMusic(vc , channel){
 		else{
 			try{
 				let now = queue[0];
-				let currentMsg = "";
 				let stream = ytdl( now.url , {audioonly : true });
 						
 				
 				channel.createMessage("Now playing : **" + now.name + "** requested by <@" + now.requested + ">")
 				.then( message =>{
-					currentmsg = message;
 					connections.play(stream);
 					message.addReaction("✅").catch(console.log);
 				})
 
 				connections.once("end" , ()=>{
 					if(queue.length >0){
-						channel.deleteMessage(currentMsg);
 						queue.shift();
 						playMusic(vc,channel);
 					}
@@ -263,21 +266,112 @@ function handleEditSongSelection(channel , choice){
 	channel.editMessage(edit , {embed} );
 }
 
-// coding rn //
-function handleQuiz(channel){
-	let embed = embed.createEmbed();
+async function handleQuiz(channel){
+	let embed = {
+		title : "Getting Quizes",
+		color : " 12648394",
+		description : "Answer with \"true\" or \"false\" . Starting in 10 seconds",
+	}
+	correct = 0;
+	number = 0;
 
-	embed.color("12648394")
-	embed.title("Choose your difficuilty")
-	embed.field("Easy" , "For Pussies");
-	embed.field("Meduim" , "Really???");
-	embed.field("Hard" , "That's more like it");
+	quiz = await getQuiz().catch(console.log);
 
-	embed.send();
+	channel.createMessage({embed}).then(msg=>{
+		edit = msg.id ;
+		inQuiz = true ;
+	});
 
+	setTimeout( ()=>{
+		channel.deleteMessage(edit)
+		showQuestion(channel);
+	},10000)
+	
 }
 
-// song Selection //
+function showQuestion(channel){
+	let embed = channel.createEmbed();
+	let j = number + 1; 
+
+	if(number !== 10){
+		embed.title("Question " + j)
+		embed.color("12648394")
+		embed.description( escapeSpecial(quiz[number].Question))
+
+		embed.send()
+
+		let t = setInterval( index =>{
+			if ( answered ){	
+				number++
+				clearInterval(t)
+				answered = false;
+				showQuestion(channel)
+			}
+		},1000);
+	}
+	else{
+		inQuiz = false;
+		embed.title("End of the quiz")
+		embed.color("1609215")
+		embed.description("You got " + correct + "/10 right")
+		embed.send();
+	}
+}
+
+
+function escapeSpecial(text){
+	let newText = text;
+
+	newText = newText.replace(/&quot;/g , '\\"' );
+	newText = newText.replace("&#039;" , "\\'" );
+	newText = newText.replace(/&amp;/g , "\\&" );
+
+	return newText;
+}
+
+function handleAnswer(answer , channel){
+
+	let embed = channel.createEmbed();
+
+	if(inQuiz === true){
+		if(quiz[number].Answer === answer){
+			correct++;
+			answered = true;
+			embed.title("u rite")
+			embed.color("1638205")
+		}
+		else{
+			answered = true;
+			embed.title('git gud buddy')
+			embed.color("16717888")
+		}
+		embed.send()
+	}
+}
+
+async function getQuiz(){
+	url = "https://opentdb.com/api.php?&category=9&type=boolean&amount=10" ;
+
+	let quiz = [];
+	
+
+	let response = await fetch(url);
+	let json = await response.json();
+	try{
+		for(var i = 0 ; i <10 ; i++){
+			let temp = { Question : "", Answer : "" } ;
+		
+			temp.Question = json.results[i].question;
+			temp.Answer = json.results[i].correct_answer;
+
+			quiz.push(temp);
+		}
+	
+	}catch{console.log};
+	return quiz;
+}
+
+// song selection //
 // working //
 bot.on("messageCreate" , msg=>{
 	let choice = msg.content;
@@ -304,6 +398,20 @@ bot.on("messageCreate" , msg=>{
 		handleEditSongSelection(msg.channel , choice);
 		handleP(song , msg.channel , msg.member.id , msg.member.voiceState.channelID);
 	}
+})
+
+bot.on("messageCreate" , msg =>{
+	let answer = msg.content;
+
+	switch(answer){
+		case("true"):
+			handleAnswer('True' , msg.channel);
+			break;
+		case('false'):
+			handleAnswer('False' , msg.channel);
+			break;
+	}
+
 })
 
 bot.connect();	
