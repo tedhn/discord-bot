@@ -7,13 +7,13 @@ const geniusApi = require('genius-api');
 const Giphy = require('giphy');
 require('eris-embed-builder');
 const fetch = require('node-fetch');
+require('dotenv').config();
 
-
-const bot = new Eris("NTA5MjU5MTY0MTM3MTYwNzE0.XXhT6w.FMqYIv4Cy5ozhAmdFmbSHe9pVlw");
-const youtube = new YouTube("AIzaSyBQX2_e827r7xZ20qeF24cNN1ELQrG_V_s");
-const lyricist = new Lyricist("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym"); 
-const genius = new geniusApi("Su9EjmaVp9OmvxWZKG0lYR1f2NiofUguRaFDh_GVHx5r5F-3JJ4VZVPNUs8Ewxym");
-const giphy = new Giphy("sYa4f5obYilF1OWcLTZBL9peVxzJdVxM");
+const bot = new Eris(process.env.ERIS);
+const youtube = new YouTube(process.env.YOUTUBE);
+const lyricist = new Lyricist(process.env.LYRICIST);
+const genius = new geniusApi(process.env.GENIUS);
+const giphy = new Giphy(process.env.GIPHY);
 
 
 let queue = [];
@@ -83,9 +83,10 @@ function handleP(url , channel , user , vc){
 }
 
 // playing music //
-// working .. sometimes //
-function playMusic(vc , channel){
+// working //
+async function playMusic(vc , channel){
 
+	let embed = channel.createEmbed();
 
 	if(queue.length !== 0){
 		if(!joined){
@@ -98,25 +99,29 @@ function playMusic(vc , channel){
 				})
 			}
 			catch(err){
-				channel.createMessage("You arent in a voice channel");
+				embed.title("You aren't in a Voice Channel")
+				embed.color("16717888")
+				embed.send()
 			}
 		}
 		else{
 			try{
 				let now = queue[0];
-				let stream = ytdl( now.url , {audioonly : true });
+				let stream = await ytdl( now.url , {audioonly : true });
 						
 				
-				channel.createMessage("Now playing : **" + now.name + "** requested by <@" + now.requested + ">")
-				.then( message =>{
-					connections.play(stream);
-					message.addReaction("✅").catch(console.log);
+				embed.title("Now playing : **" + now.name + "**" )
+				embed.description("Requested by [<@" + now.requested + ">]")
+				embed.color("1638205")
+
+				embed.send().then( message =>{
+					connections.play(stream)
 				})
 
 				connections.once("end" , ()=>{
 					if(queue.length >0){
-						queue.shift();
-						playMusic(vc,channel);
+						queue.shift()
+						playMusic(vc,channel)
 					}
 				})
 			}
@@ -126,9 +131,11 @@ function playMusic(vc , channel){
 		}
 	}
 	else{
-		connections.stopPlaying();
-		channel.createMessage("All songs have been played");
-		bot.leaveVoiceChannel(vc);
+		connections.stopPlaying()
+		embed.title("All songs have been played")
+		embed.color("1638205")
+		embed.send()
+		bot.leaveVoiceChannel(vc)
 	}
 }
 
@@ -137,24 +144,28 @@ function playMusic(vc , channel){
 // working //
 function handleQ(channel){
 
-	try{	
-		let list = "" ;
+	let embed = channel.createEmbed();
 
+	try{	
 		if(queue.length === 0){
-			channel.createMessage("Queue is empty");
+			embed.title("Queue is empty")
+			embed.description("Go add some songs :D")
+			embed.color("16738690")
+			embed.send()
 		}
 		else{
 			queue.map( (q , i )=>{
 
 				if ( joined  && i === 0){
-					list = list + "```Currently Playing : " + q.name + "\n\n";
+					embed.title("Currently Playing : " + q.name  )
+					embed.description("Requested by : [<@ " + queue.requested + ">]")
+					embed.color("6946790")
 				}
 				else{
-					list = list + i + " ) " + q.name + " \n";
+					embed.field(i + " ) " + q.name, "Requested by [<@" + queue.requested + ">]")
 				}
 			})
-			list = list + "```";
-			channel.createMessage(list);
+			embed.send();
 		}
 	}
 	catch(err){
@@ -202,8 +213,8 @@ function handleL(title,channel){
 
 // finding songs on youtube //
 // working //
-function handleYoutubeSearch(q ,channel){
-
+async function handleYoutubeSearch(q ,channel){
+	
 	list = [];
 
 	let embed = channel.createEmbed();
@@ -211,19 +222,22 @@ function handleYoutubeSearch(q ,channel){
 	embed.title("Choose one (1 - 5)");
 	embed.color("16761035")
 
-	youtube.search(q).then(result =>{
+	let result = await youtube.search(q)
 
-		while(list.length < 5 ){
-			try{				
-				num = list.length + 1 ;
-				embed.field(num +") **" + result[list.length].title +"**", "Channel : " + result[list.length].channel.title).then(
-					list.push( {id : result[list.length].id , title : result[list.length].title })
-				);
-			}
-			catch{console.log};
-		}		
-		embed.send().then(msg=>{edit = msg.id});
-	});
+	while( list.length < 5 ){
+		
+		try{				
+	    num = list.length + 1 ;
+			let title = escapeSpecial(result[list.length].title);
+			embed.field(num +") " + title , "Channel : " + result[list.length].channel.title)	
+			list.push( {id : result[list.length].id , title : title })
+
+		}
+		catch{console.log}
+	}
+
+	embed.send().then(msg=>{edit = msg.id});
+	
 }
 
 // gify search function //
@@ -266,6 +280,7 @@ function handleEditSongSelection(channel , choice){
 	channel.editMessage(edit , {embed} );
 }
 
+// working //
 async function handleQuiz(channel){
 	let embed = {
 		title : "Getting Quizes",
@@ -289,6 +304,7 @@ async function handleQuiz(channel){
 	
 }
 
+// working //
 function showQuestion(channel){
 	let embed = channel.createEmbed();
 	let j = number + 1; 
@@ -318,17 +334,21 @@ function showQuestion(channel){
 	}
 }
 
-
+// working i guess //
 function escapeSpecial(text){
+	
 	let newText = text;
-
+console.log(newtext)
 	newText = newText.replace(/&quot;/g , '\\"' );
+	console.log(newtext)
 	newText = newText.replace("&#039;" , "\\'" );
+	console.log(newtext)
 	newText = newText.replace(/&amp;/g , "\\&" );
-
+console.log(newtext)
 	return newText;
 }
 
+// working //
 function handleAnswer(answer , channel){
 
 	let embed = channel.createEmbed();
@@ -349,6 +369,7 @@ function handleAnswer(answer , channel){
 	}
 }
 
+// working //
 async function getQuiz(){
 	url = "https://opentdb.com/api.php?&category=9&type=boolean&amount=10" ;
 
@@ -400,6 +421,7 @@ bot.on("messageCreate" , msg=>{
 	}
 })
 
+// working //
 bot.on("messageCreate" , msg =>{
 	let answer = msg.content;
 
