@@ -1,3 +1,5 @@
+const Neko = require('nekos.life');
+const neko = new Neko();
 
 
 module.export = async function handleNeko(channel){

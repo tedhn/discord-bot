@@ -3,24 +3,19 @@ const Eris = require('eris');
 require('dotenv').config();
 require('eris-embed-builder');
 
-const Giphy = require('giphy');
-const Neko = require('nekos.life');
-
 const { handleQuiz , handleAnswer } = require('./function/Quiz');
 const { handleYoutubeSearch , queue , handleEditSongSelection , handleMusic} = require('./function/Music');
 const handleL = require('./function/Lyrics');
+const handleNeko = require('./function/Neko');
+const handleSearch = require('./function/Giphy');
 
 const bot = new Eris(process.env.ERIS);
 
-
-const giphy = new Giphy(process.env.GIPHY);
-const neko = new Neko();
-
+let prefix = "`";
 
 let joined = false;
 let num = 0 ;
 let song = '';
-let prefix = "`";
 
 // need to fix Music.js and Queue.js 
 

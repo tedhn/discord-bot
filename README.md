@@ -1,7 +1,11 @@
 # discord-bot
 A small discord bot
 
-  Available Features :
+	log :
+
+		9/24/2019 : cleaned up the codes
+
+  Features log :
   
     Playing music from youtube
 

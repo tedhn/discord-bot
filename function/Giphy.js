@@ -1,3 +1,5 @@
+const Giphy = require('giphy');
+const giphy = new Giphy(process.env.GIPHY);
 
 
 module.exports = function handleSearch(q , channel ,i){
