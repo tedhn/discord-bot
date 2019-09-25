@@ -3,20 +3,20 @@ require('dotenv').config();
 require('eris-embed-builder');
 
 const { handleQuiz , handleAnswer } = require('./function/Quiz');
-const { handleYoutubeSearch , handleEditSongSelection , handleMusic } = require('./function/Music');
+const { handleYoutubeSearch , handleEditSongSelection , handleP } = require('./function/Music');
 const {getState , setState } = require('./function/State');
 const handleL = require('./function/Lyrics');
+const handleQ = require('./function/Queue');
 const handleNeko = require('./function/Neko');
 const handleSearch = require('./function/Giphy');
 
 const bot = new Eris(process.env.ERIS);
+setState(4 , bot);
 
 let prefix = "`";
-
 let num = 0 ;
 
 bot.on("ready" , () =>{
-	setState(4 , bot);
 	console.log("Ready");
 	bot.editStatus("online" , { name : " your desires" , type : 2 })
 })
@@ -94,7 +94,7 @@ bot.on("messageCreate" , msg=>{
 		}
 
 		handleEditSongSelection(msg.channel , choice);
-		handleMusic(song , msg.channel , msg.member.id , msg.member.voiceState.channelID);
+		handleP(song , msg.channel , msg.member.id , msg.member.voiceState.channelID);
 	}
 })
 
