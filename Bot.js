@@ -1,10 +1,10 @@
-
 const Eris = require('eris');
 require('dotenv').config();
 require('eris-embed-builder');
 
 const { handleQuiz , handleAnswer } = require('./function/Quiz');
 const { handleYoutubeSearch , handleEditSongSelection , handleMusic } = require('./function/Music');
+const {getState , setState } = require('./function/State');
 const handleL = require('./function/Lyrics');
 const handleNeko = require('./function/Neko');
 const handleSearch = require('./function/Giphy');
@@ -15,24 +15,8 @@ let prefix = "`";
 
 let num = 0 ;
 
-const state = {
-	queue : [],
-	joined : false,
-	song : '',
-	list : []
-}
-
-const get = (key) => {
-  return state[key];
-};
-
-const set = (key, val) => {
-  state[key] = val;
-};
-
-module.exports ={get, set};
-
 bot.on("ready" , () =>{
+	setState(4 , bot);
 	console.log("Ready");
 	bot.editStatus("online" , { name : " your desires" , type : 2 })
 })
@@ -87,29 +71,30 @@ bot.on("messageCreate" , msg =>{
 
 bot.on("messageCreate" , msg=>{
 	let choice = msg.content;
-
+	let song = getState(2);
+	let list = getState(3);
 
 	if(choice.length === 1){ 
 		switch(choice){
 			case "1" :
-				state.song = "https://www.youtube.com/watch?v=" + state.list[0].id ;
+				song = "https://www.youtube.com/watch?v=" + list[0].id ;
 				break;
 			case "2" :
-				state.song  = "https://www.youtube.com/watch?v=" + state.list[1].id ;
+				song  = "https://www.youtube.com/watch?v=" + list[1].id ;
 				break;
 			case "3" :
-				state.song  = "https://www.youtube.com/watch?v=" + state.list[2].id ;
+				song  = "https://www.youtube.com/watch?v=" + list[2].id ;
 				break;
 			case "4" :
-				state.song  = "https://www.youtube.com/watch?v=" + state.list[3].id ;
+				song  = "https://www.youtube.com/watch?v=" + list[3].id ;
 				break;
 			case "5" :
-				state.song  = "https://www.youtube.com/watch?v=" + state.list[4].id ;
+				song  = "https://www.youtube.com/watch?v=" + list[4].id ;
 				break;				
 		}
 
-		//handleEditSongSelection(msg.channel , choice);
-		handleMusic(state.song , msg.channel , msg.member.id , msg.member.voiceState.channelID);
+		handleEditSongSelection(msg.channel , choice);
+		handleMusic(song , msg.channel , msg.member.id , msg.member.voiceState.channelID);
 	}
 })
 

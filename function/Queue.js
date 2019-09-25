@@ -1,7 +1,7 @@
-const {get , set} = require('../Bot');
+const {getState , setState} = require('./State');
 
-let queue = get(1);
-let joined = get(2);
+let queue = getState(1);
+let joined = getState(2);
 
 
 function handleQ(channel){

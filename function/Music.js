@@ -1,20 +1,20 @@
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');
 const escapeSpecial = require('./Utility');
-const {get , set}  = require('../Bot');
+const {getState, setState } = require('./State');
 
 const youtube = new YouTube(process.env.YOUTUBE);
 
 let connections = [];
 let edit = "";
-let list = [];
-let queue = get(1);
-
+let queue = [];
+let bot = getState(4);
 
 module.exports = {
 
 	handleYoutubeSearch : async function handleYoutubeSearch(q ,channel){	
 		list = [];
+		console.log(bot);
 
 		let embed = channel.createEmbed();
 
@@ -35,7 +35,7 @@ module.exports = {
 			catch{console.log}
 		}
 
-		set(4, list);
+		setState(3, list);
 
 		embed.send().then(msg=>{edit = msg.id});
 		
@@ -62,6 +62,8 @@ module.exports = {
 
 			queue.push({name : title , url : "https://www.youtube.com/watch?v=" + id , requested : user})
 
+			setState(0 , queue);
+
 			if(connections.playing === undefined){
 				playMusic(vc,channel);
 			}
@@ -72,14 +74,14 @@ module.exports = {
 async function playMusic(vc , channel){
 
 	let embed = channel.createEmbed();
+	let joined = getState(1);
 
 	if(queue.length !== 0){
 		if(!joined){
 			try{
 				bot.joinVoiceChannel(vc).then( connection =>{
 					connections =  connection ;
-					set(2, true )
-
+					setState(1, true )
 					playMusic(vc , channel);
 				})
 			}
@@ -103,12 +105,11 @@ async function playMusic(vc , channel){
 					connections.play(stream)
 				})
 
-				connections.once("end" , ()=>{
-					if(queue.length >0){
-						queue.shift()
-						playMusic(vc,channel)
-					}
-				})
+				if(queue.length >0){
+					queue.shift()
+					playMusic(vc,channel)
+				}
+
 			}
 			catch(err){
 				console.log(err);
