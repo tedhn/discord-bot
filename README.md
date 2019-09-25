@@ -1,9 +1,12 @@
 # discord-bot
 A small discord bot
 
-	log :
+	logs :
 
 		9/24/2019 : cleaned up the codes
+
+		9/25/2019 : Music and Queue are working again
+
 
   Features log :
   
