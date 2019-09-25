@@ -1,15 +1,18 @@
 const YouTube = require('simple-youtube-api');
 const ytdl = require('ytdl-core');
 const escapeSpecial = require('./Utility');
+const {get , set}  = require('../Bot');
 
 const youtube = new YouTube(process.env.YOUTUBE);
 
 let connections = [];
 let edit = "";
 let list = [];
-let queue = []
+let queue = get(1);
+
 
 module.exports = {
+
 	handleYoutubeSearch : async function handleYoutubeSearch(q ,channel){	
 		list = [];
 
@@ -32,11 +35,12 @@ module.exports = {
 			catch{console.log}
 		}
 
+		set(4, list);
+
 		embed.send().then(msg=>{edit = msg.id});
 		
 	},
-	queue = queue,
-	
+
 	handleEditSongSelection : function handleEditSongSelection(channel , choice){
 
 		let embed = {
@@ -62,7 +66,7 @@ module.exports = {
 				playMusic(vc,channel);
 			}
 		});
-	}	
+	}
 }
 
 async function playMusic(vc , channel){
@@ -74,7 +78,7 @@ async function playMusic(vc , channel){
 			try{
 				bot.joinVoiceChannel(vc).then( connection =>{
 					connections =  connection ;
-					joined = true;
+					set(2, true )
 
 					playMusic(vc , channel);
 				})

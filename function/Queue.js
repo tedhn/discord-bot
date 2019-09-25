@@ -1,5 +1,10 @@
+const {get , set} = require('../Bot');
 
-function handleQ(channel , joined){
+let queue = get(1);
+let joined = get(2);
+
+
+function handleQ(channel){
 
 	let embed = channel.createEmbed();
 

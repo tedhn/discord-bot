@@ -6,6 +6,8 @@ let inQuiz = false;
 let answered = false;
 let correct = 0;
 let number = 0;
+let edit = '';
+
 
 module.exports = { 
 	handleQuiz : async function handleQuiz(channel){
@@ -25,13 +27,12 @@ module.exports = {
 	});
 
 	setTimeout( ()=>{
-		channel.deleteMessage(edit)
 		showQuestion(channel);
-	},10000)
+	},5000)
 	
 	},
 
-	handleAnswer : function handleAnswer(answer , channel){
+	handleAnswer : function handleAnswer(answer , channel , id){
 
 	let embed = channel.createEmbed();
 
@@ -39,30 +40,30 @@ module.exports = {
 		if(quiz[number].Answer === answer){
 			correct++;
 			answered = true;
-			embed.title("u rite")
-			embed.color("1638205")
 		}
 		else{
 			answered = true;
-			embed.title('git gud buddy')
-			embed.color("16717888")
 		}
-		embed.send()
+		}
 	}
 }
 
 
-}
+
 function showQuestion(channel){
-	let embed = channel.createEmbed();
+	let embed = {
+		title : '',
+		description : ''
+	}
 	let j = number + 1; 
 
-	if(number !== 10){
-		embed.title("Question " + j)
-		embed.color("12648394")
-		embed.description( escapeSpecial(quiz[number].Question))
 
-		embed.send()
+	if(number !== 10){
+		embed.title = "Question " + j ;
+		embed.color = "12648394" ;
+		embed.description = escapeSpecial(quiz[number].Question) ;
+
+		channel.editMessage(edit , {embed})
 
 		let t = setInterval( index =>{
 			if ( answered ){	
@@ -75,10 +76,10 @@ function showQuestion(channel){
 	}
 	else{
 		inQuiz = false;
-		embed.title("End of the quiz")
-		embed.color("1609215")
-		embed.description("You got " + correct + "/10 right")
-		embed.send();
+		embed.title = "End of the quiz" ;
+		embed.color = "1609215" ;
+		embed.description = "You got " + correct + "/10 right" ;
+		channel.editMessage(edit , {embed})
 	}
 }
 
