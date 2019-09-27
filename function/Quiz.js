@@ -1,16 +1,19 @@
 const fetch = require('node-fetch');
-const escapeSpecial = require('./Utility');
+const {escapeSpecial , replaceAt} = require('./Utility');
+const {getState , setState } = require('./State');
+
 
 let quiz = [];
-let inQuiz = false;
 let answered = false;
 let correct = 0;
 let number = 0;
 let edit = '';
+let progress = '▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱';
 
 
-module.exports = { 
-	handleQuiz : async function handleQuiz(channel){
+async function handleQuiz(msg){
+	progress = '▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱ ▱';
+	let channel = msg.channel
 	let embed = {
 		title : "Getting Quizes",
 		color : " 12648394",
@@ -23,68 +26,70 @@ module.exports = {
 
 	channel.createMessage({embed}).then(msg=>{
 		edit = msg.id ;
-		inQuiz = true ;
 	});
 
+	setState(5 , true)
+
 	setTimeout( ()=>{
-		showQuestion(channel);
+		showQuestion(channel , msg.member.user);
 	},5000)
 	
-	},
+	}
 
-	handleAnswer : function handleAnswer(answer , channel , id){
+function handleAnswer(answer , channel , id){
 
-	let embed = channel.createEmbed();
-
-	if(inQuiz === true){
+	if(getState(5) === true){
 		if(quiz[number].Answer === answer){
 			correct++;
+			progress = replaceAt(progress, number*2 , '▰' )
 			answered = true;
 		}
 		else{
 			answered = true;
 		}
-		}
+		
 	}
 }
 
-
-
-function showQuestion(channel){
-	let embed = {
-		title : '',
-		description : ''
-	}
+async function showQuestion(channel ,user){
+	let embed = channel.createEmbed();
 	let j = number + 1; 
 
 
 	if(number !== 10){
-		embed.title = "Question " + j ;
-		embed.color = "12648394" ;
-		embed.description = escapeSpecial(quiz[number].Question) ;
+		embed.title("Question " + j)
+		embed.color("12648394")
+		embed.description(escapeSpecial(quiz[number].Question) + '\n')
+		embed.field(progress , "Total correct answers : " +  correct);
+		embed.footer("Requested by " + user.username , user.avatarURL);
 
-		channel.editMessage(edit , {embed})
+		await channel.deleteMessage(edit).catch(console.log)
+		let msg = await embed.send().catch(console.log);
+		edit = msg.id;
+		msg.addReaction('✅')
+		msg.addReaction('❌')
 
 		let t = setInterval( index =>{
-			if ( answered ){	
+			if ( answered ){		
 				number++
 				clearInterval(t)
 				answered = false;
-				showQuestion(channel)
+				showQuestion(channel , user)
 			}
-		},1000);
+		},500);
 	}
 	else{
-		inQuiz = false;
+		setState(5,false)
 		embed.title = "End of the quiz" ;
 		embed.color = "1609215" ;
 		embed.description = "You got " + correct + "/10 right" ;
-		channel.editMessage(edit , {embed})
+		channel.deleteMessage(edit)
+		channel.createMessage({embed})
 	}
 }
 
 async function getQuiz(){
-	url = "https://opentdb.com/api.php?&category=9&type=boolean&amount=10" ;
+	url = "https://opentdb.com/api.php?&category=9&type=boolean&amount=50" ;
 
 	let quiz = [];
 	
@@ -93,10 +98,11 @@ async function getQuiz(){
 	let json = await response.json();
 	try{
 		for(var i = 0 ; i <10 ; i++){
+			let rand = Math.floor(Math.random() * 100 / 2);
 			let temp = { Question : "", Answer : "" } ;
 		
-			temp.Question = json.results[i].question;
-			temp.Answer = json.results[i].correct_answer;
+			temp.Question = json.results[rand].question;
+			temp.Answer = json.results[rand].correct_answer;
 
 			quiz.push(temp);
 		}
@@ -104,3 +110,5 @@ async function getQuiz(){
 	}catch{console.log};
 	return quiz;
 }
+
+module.exports = { handleQuiz , handleAnswer }

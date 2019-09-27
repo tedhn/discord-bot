@@ -1,4 +1,4 @@
-module.exports = function escapeSpecial(text){
+function escapeSpecial(text){
 	
 	let newText = text;
 
@@ -8,3 +8,10 @@ module.exports = function escapeSpecial(text){
 	newText = newText.replace(/&amp;/g , "\\&" );
 	return newText;
 }
+
+function replaceAt(string , index , replaceWith){
+	let newString = string.substring(0,index) + replaceWith + string.substring(index+1 , string.length);
+	return newString;
+}
+
+module.exports= {escapeSpecial , replaceAt}

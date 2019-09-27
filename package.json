@@ -1,7 +1,7 @@
 {
 		"name": "slut-bot",
-		"description": "dumb ass bot",
-		"version": "1.0.0",
+		"description": "dumb ass bot made by a dumber human",
+		"version": "1.5.0",
 		"main": "Bot.js",
 		"scripts": {
 				"start": "node Bot.js"

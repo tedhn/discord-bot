@@ -23,6 +23,7 @@ bot.on("ready" , () =>{
 
 
 bot.on("messageCreate", msg => {
+
 		
 	let arg = msg.content.split(" ")[0];
 
@@ -42,7 +43,7 @@ bot.on("messageCreate", msg => {
 				handleSearch( q , msg.channel , num);
 			}
 			else if ( arg === prefix + "quiz"){
-				handleQuiz(msg.channel);
+				handleQuiz(msg);
 			}
 			else if ( arg === prefix + "neko"){
 				handleNeko(msg.channel);
@@ -54,18 +55,16 @@ bot.on("messageCreate", msg => {
 });
 
 
-bot.on("messageCreate" , msg =>{
+bot.on("messageReactionAdd" , msg =>{
 	let answer = msg.content;
 
-	switch(answer){
-		case("true"):
+	if(Object.keys(msg.reactions).length === 2){
+		if(msg.reactions['✅'].count == 2)
 			handleAnswer('True' , msg.channel , msg.id);
-			break;
-		case('false'):
+		else if(msg.reactions['❌'].count == 2){		
 			handleAnswer('False' , msg.channel , msg.id);
-			break;
+		}
 	}
-
 })
 
 
@@ -74,7 +73,7 @@ bot.on("messageCreate" , msg=>{
 	let song = getState(2);
 	let list = getState(3);
 
-	if(choice.length === 1){ 
+	if(choice.length === '\^\d{9}?$'){ 
 		switch(choice){
 			case "1" :
 				song = "https://www.youtube.com/watch?v=" + list[0].id ;

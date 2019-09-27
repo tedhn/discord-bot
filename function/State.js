@@ -4,7 +4,8 @@ const state = {
 	joined : false,
 	song : '11111111',
 	list : [],
-	bot : {}
+	bot : {},
+	inQuiz : false,
 }
 
 const getState = (key) => {
