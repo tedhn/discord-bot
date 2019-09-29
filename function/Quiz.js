@@ -36,7 +36,7 @@ async function handleQuiz(msg){
 	
 	}
 
-function handleAnswer(answer , channel , id){
+function handleAnswer(answer){
 
 	if(getState(5) === true){
 		if(quiz[number].Answer === answer){

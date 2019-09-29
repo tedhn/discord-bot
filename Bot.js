@@ -9,6 +9,7 @@ const handleL = require('./function/Lyrics');
 const handleQ = require('./function/Queue');
 const handleNeko = require('./function/Neko');
 const handleSearch = require('./function/Giphy');
+const handleWeather = require('./function/Weather');
 
 const bot = new Eris(process.env.ERIS);
 setState(4 , bot);
@@ -29,27 +30,30 @@ bot.on("messageCreate", msg => {
 
 		if(msg.member.id !== "509259164137160714"){
 			if(arg ===  prefix + "p"){
-				handleYoutubeSearch( msg.content.substring(2,msg.content.length) , msg.channel); 			
+				handleYoutubeSearch( msg.content.substring(2,msg.content.length) , msg.channel)			
 			}
 			else if ( arg == prefix + "q"){
 				handleQ( msg.channel );
 			}
 			else if ( arg === prefix + "l"){
 				let title = msg.content.substring(2,msg.content.length);
-				handleL(title,msg.channel);
+				handleL(title,msg.channel)
 			}
 			else if( arg === prefix + "search"){
 				q = msg.content.split(" ")[1];
-				handleSearch( q , msg.channel , num);
+				handleSearch( q , msg.channel , num)
 			}
 			else if ( arg === prefix + "quiz"){
-				handleQuiz(msg);
+				handleQuiz(msg)
 			}
 			else if ( arg === prefix + "neko"){
-				handleNeko(msg.channel);
-			}			
+				handleNeko(msg.channel)
+			}	
+			else if ( arg === prefix + "weather"){
+				handleWeather(msg)
+			}		
 			else if ( arg === prefix + "help"){
-				msg.channel.createMessage(" %p  to start playing songs \n %q to see the queue \n %l to find the lyrics of the song \n %search to find images / gifs");
+				msg.channel.createMessage(" %p  to start playing songs \n %q to see the queue \n %l to find the lyrics of the song \n %search to find images / gifs")
 			}
 		}
 });
@@ -58,11 +62,11 @@ bot.on("messageCreate", msg => {
 bot.on("messageReactionAdd" , msg =>{
 	let answer = msg.content;
 
-	if(Object.keys(msg.reactions).length === 2){
+	if(Object.keys(msg.reactions).length >= 2){
 		if(msg.reactions['✅'].count == 2)
-			handleAnswer('True' , msg.channel , msg.id);
+			handleAnswer('True');
 		else if(msg.reactions['❌'].count == 2){		
-			handleAnswer('False' , msg.channel , msg.id);
+			handleAnswer('False');
 		}
 	}
 })

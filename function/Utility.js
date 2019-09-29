@@ -14,4 +14,8 @@ function replaceAt(string , index , replaceWith){
 	return newString;
 }
 
-module.exports= {escapeSpecial , replaceAt}
+function KtoF(kelvin){
+	return ((kelvin - 273.15) * 9/5 + 32 );
+}
+
+module.exports= {escapeSpecial , replaceAt , KtoF}

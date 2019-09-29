@@ -6,6 +6,7 @@ const state = {
 	list : [],
 	bot : {},
 	inQuiz : false,
+	choice : '0'
 }
 
 const getState = (key) => {
