@@ -28,7 +28,7 @@ async function handleQuiz(msg){
 		edit = msg.id ;
 	});
 
-	setState(5 , true)
+	setState('inQuiz' , true)
 
 	setTimeout( ()=>{
 		showQuestion(channel , msg.member.user);
@@ -38,8 +38,8 @@ async function handleQuiz(msg){
 
 function handleAnswer(answer){
 
-	if(getState(5) === true){
-		if(quiz[number].Answer === answer){
+	if(getState('inQuiz') === true){
+		if(quiz[inQ].Answer === answer){
 			correct++;
 			progress = replaceAt(progress, number*2 , '▰' )
 			answered = true;

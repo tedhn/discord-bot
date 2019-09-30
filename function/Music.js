@@ -31,7 +31,7 @@ async function handleYoutubeSearch(q ,channel){
 		catch{console.log}
 	}
 
-	setState(3, list);
+	setState('list', list);
 
 	embed.send().then(msg=>{edit = msg.id});
 	
@@ -58,7 +58,7 @@ function handleP(url , channel , user , vc){
 
 		queue.push({name : title , url : "https://www.youtube.com/watch?v=" + id , requested : user})
 
-		setState(0 , queue);
+		setState('queue' , queue);
 
 		if(connections.playing === undefined){
 			playMusic(vc,channel);
@@ -69,14 +69,14 @@ function handleP(url , channel , user , vc){
 async function playMusic(vc , channel){
 
 	let embed = channel.createEmbed();
-	let joined = getState(1);
+	let joined = getState('joined');
 
 	if(queue.length !== 0){
 		if(!joined){
 			try{
-				getState(4).joinVoiceChannel(vc).then( connection =>{
+				getState('bot').joinVoiceChannel(vc).then( connection =>{
 					connections =  connection ;
-					setState(1, true )
+					setState('joined', true )
 					playMusic(vc , channel);
 				})
 			}
@@ -117,7 +117,7 @@ async function playMusic(vc , channel){
 		embed.title("All songs have been played")
 		embed.color("1638205")
 		embed.send()
-		getState(4).leaveVoiceChannel(vc)
+		getState('bot').leaveVoiceChannel(vc)
 	}
 }
 

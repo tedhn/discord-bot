@@ -9,10 +9,10 @@ const handleL = require('./function/Lyrics');
 const handleQ = require('./function/Queue');
 const handleNeko = require('./function/Neko');
 const handleSearch = require('./function/Giphy');
-const handleWeather = require('./function/Weather');
+const { handleWeather , showForecast } = require('./function/Weather');
 
 const bot = new Eris(process.env.ERIS);
-setState(4 , bot);
+setState('bot' , bot);
 
 let prefix = "`";
 let num = 0 ;
@@ -61,12 +61,29 @@ bot.on("messageCreate", msg => {
 
 bot.on("messageReactionAdd" , msg =>{
 	let answer = msg.content;
+	let choice = getState('choice');
 
-	if(Object.keys(msg.reactions).length >= 2){
-		if(msg.reactions['✅'].count == 2)
-			handleAnswer('True');
-		else if(msg.reactions['❌'].count == 2){		
-			handleAnswer('False');
+	if(getState('inQuiz')){
+		if(Object.keys(msg.reactions).length >= 2){
+			if(msg.reactions['✅'].count == 2)
+				handleAnswer('True');
+			else if(msg.reactions['❌'].count == 2){		
+				handleAnswer('False');
+			}
+		}
+	}
+	else{
+		if(Object.keys(msg.reactions).length >= 2){
+			if(msg.reactions['⏪'].count == 2){
+				setState('choice' , getState('choice')++)
+				showForecast(msg)
+			}
+			else if(msg.reactions['⏩'].count == 2){
+				choice ++
+				setState('choice' , choice)
+				console.log(getState('choice'))
+				showForecast(msg)
+			}		
 		}
 	}
 })
@@ -74,8 +91,8 @@ bot.on("messageReactionAdd" , msg =>{
 
 bot.on("messageCreate" , msg=>{
 	let choice = msg.content;
-	let song = getState(2);
-	let list = getState(3);
+	let song = getState('song');
+	let list = getState('list');
 
 	if(choice.length === '\^\d{9}?$'){ 
 		switch(choice){

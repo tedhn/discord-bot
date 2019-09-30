@@ -6,7 +6,8 @@ const state = {
 	list : [],
 	bot : {},
 	inQuiz : false,
-	choice : '0'
+	choice : 0,
+	weather : {},
 }
 
 const getState = (key) => {
