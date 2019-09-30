@@ -9,23 +9,23 @@ A small discord bot
 
 		9/27/2019 : Quiz UI has been updated / Quiz Questions are more random
 
+		9/30/2019 : Added a weather forecast for jung
+
 
   Features log :
   
-    Playing music from youtube
+  	Playing music from youtube
 
-    Searching up lyrics
+  	Searching up lyrics
 
-    Getting Giphy images / gifs
+  	Getting Giphy images / gifs
 
-    Small Quiz
+  	Small Quiz
+
+		Weather Forecast
 
   To add / do :
 
-		remove repeating questions in quiz
-  
-    bingo
+  	bingo
 
-		weekly weather forecast for jung
-
-    idk the rest
+  	idk the rest
